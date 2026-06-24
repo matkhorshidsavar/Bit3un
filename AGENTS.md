@@ -1,7 +1,7 @@
 # Agent guide
 
 App: **a-modern-u0zz** at https://a-modern-u0zz.vibekit.bot
-Repo: template/landing | Port: 4098
+Repo: matkhorshidsavar/a-modern-u0zz | Port: 4098
 
 ## NEVER (these break the product)
 - **NEVER point the user at localhost / `npm start` / `node server.js` / "open in browser"** — only **https://a-modern-u0zz.vibekit.bot**. They're on a phone, no terminal.
