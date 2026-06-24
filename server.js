@@ -1,15 +1,16 @@
+import express from 'express'
+import sirv from 'sirv'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
 
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const PORT = process.env.PORT || 3000;
-http.createServer((req, res) => {
-  try {
-    const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(html);
-  } catch (e) {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end('<html><body style="background:#0a0a0f;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh"><h1>Setting up...</h1></body></html>');
-  }
-}).listen(PORT, () => console.log('Placeholder ready on port ' + PORT));
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const app = express()
+const PORT = process.env.PORT || 3000
+
+// Serve static build output
+const assets = sirv(join(__dirname, 'dist'), { single: true, etag: true })
+app.use(assets)
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`BIT3UN running on port ${PORT}`)
+})

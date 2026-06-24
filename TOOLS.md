@@ -1,4 +1,4 @@
-# TOOLS.md — a-modern-u0zz
+# TOOLS.md — bit3un
 
 ## What you have
 - Shell: node, npm, git, curl (sandboxed — no docker/aws/ssh)

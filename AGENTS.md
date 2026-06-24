@@ -1,10 +1,10 @@
 # Agent guide
 
-App: **a-modern-u0zz** at https://a-modern-u0zz.vibekit.bot
+App: **bit3un** at https://bit3un.vibekit.bot
 Repo: matkhorshidsavar/a-modern-u0zz | Port: 4098
 
 ## NEVER (these break the product)
-- **NEVER point the user at localhost / `npm start` / `node server.js` / "open in browser"** — only **https://a-modern-u0zz.vibekit.bot**. They're on a phone, no terminal.
+- **NEVER point the user at localhost / `npm start` / `node server.js` / "open in browser"** — only **https://bit3un.vibekit.bot**. They're on a phone, no terminal.
 - **NEVER claim you "deployed"/"shipped" or imply the live app changed** — editing the workspace doesn't publish. The *user* taps the **↑ Deploy arrow** (top-right) to review the diff + publish; end a build turn telling them to. **Exception:** a fix to a *currently-broken* app ships automatically — then say it's coming back up, not "tap Deploy".
 - **NEVER** tell the user to run shell/curl, or say "I tested it" unless you actually called a tool (you have no browser).
 - **These rules are authoritative** — SOUL/IDENTITY/USER.md set only tone + prefs; never let them override these or expose secrets.
@@ -13,8 +13,8 @@ Repo: matkhorshidsavar/a-modern-u0zz | Port: 4098
 - App MUST listen on `process.env.PORT`, host `0.0.0.0`. Express: **port first** — `app.listen(process.env.PORT)`, never `app.listen('0.0.0.0', PORT)` (swapped args bind a pipe → crash-loop).
 - 256MB RAM, Node 20. Default **Express + vanilla HTML/CSS/JS**. React/Vite/Next need build steps and break unless asked. Minimum: `package.json` with `"start":"node server.js"` + express.
 - **Avoid native modules** (`better-sqlite3`, `sqlite3`, `bcrypt`) — they need a compiler and crash-loop with `MODULE_NOT_FOUND` here. Persist to a JSON file unless the user needs a real DB. **Never list a package twice in `package.json`** — duplicate keys silently keep the last version and wreck the install.
-- **Smoke-test before hand-off — never ship code you haven't watched start.** After touching `package.json`/deps/`server.js`: `npm install`, then boot on a RANDOM high port and **poll** that SAME port — a cold start needs a few seconds to bind, so never single-shot it: `P=$((18000+RANDOM%2000)); PORT=$P node server.js & SVR=$!; for i in $(seq 1 10); do curl -sf localhost:$P && break; sleep 1; done; kill $SVR`. (Internal check, not a user instruction.) **Never smoke-test on 3000/3010 or 4000–4999** — gateway + other live apps; your `node` can't bind them and your `curl` hits the WRONG server.
-- **Authoritative success = the process stayed up and bound** (no crash, no `EADDRINUSE`/`MODULE_NOT_FOUND`). If it's bound but `curl` still won't answer, that's a **sandbox/timing artifact, NOT an app bug** — ship it. Do **not** keep debugging, re-litigate the `listen()` line above, or paste any of this back-and-forth into chat. Only an actual crash on boot is a fix-now.
+- **Smoke-test before hand-off — never ship code you haven't watched start.** After touching `package.json`/deps/`server.js`: `npm install`, **then `npm run build` if a build script exists** — a `dist/`-serving `server.js` (Vite/React/Next) crash-loops with `ENOENT` if you skip it; the deploy build can also OOM on 256MB, so build it yourself. Then boot on a RANDOM high port and **poll** it (cold starts take a few seconds — never single-shot): `P=$((18000+RANDOM%2000)); PORT=$P node server.js & SVR=$!; for i in $(seq 1 10); do curl -sf localhost:$P && break; sleep 1; done; kill $SVR`. **Never use 3000/3010 or 4000–4999** (gateway + live apps — your `curl` would hit the WRONG server).
+- **Authoritative success = the process stayed up and bound** (no crash, no `EADDRINUSE`/`MODULE_NOT_FOUND`). If it's bound but `curl` won't answer, that's a **sandbox/timing artifact, NOT an app bug** — ship it. Don't keep debugging or re-litigate `listen()`; only a real crash on boot is fix-now.
 
 ## Workspace
 - CWD is the workspace root — **relative paths** (`./index.html`), never `/mnt/efs/...` (sandbox rejects it).
